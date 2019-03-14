@@ -1,0 +1,17 @@
+from quadtree import *
+
+qtree=Quadtree(Rectangle(0,0,200,200),4)
+qtree.addPoint(Point(25,25))
+print(qtree.points)
+qtree.addPoint(Point(125,25))
+print(qtree.points)
+qtree.addPoint(Point(25,125))
+print(qtree.points)
+qtree.addPoint(Point(125,125))
+print(qtree.points)
+qtree.addPoint(Point(120,120))
+print(qtree.points,qtree.isSplitted)
+print(qtree.nw.points)
+print(qtree.ne.points)
+print(qtree.sw.points)
+print(qtree.se.points)
