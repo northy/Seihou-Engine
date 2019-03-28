@@ -51,6 +51,10 @@ class Quadtree :
         w=self.boundary.w
         h=self.boundary.h
         self.nw=Quadtree(Rectangle(x,y,w//2,h//2),self.capacity)
-        self.ne=Quadtree(Rectangle(x,y+(y//2),w//2,h//2),self.capacity)
-        self.sw=Quadtree(Rectangle(x+(x//2),y,w//2,h//2),self.capacity)
-        self.se=Quadtree(Rectangle(x+(x//2),y+(y//2),w//2,h//2),self.capacity)
+        self.sw=Quadtree(Rectangle(x,y+(h//2),w//2,h//2),self.capacity)
+        self.ne=Quadtree(Rectangle(x+(w//2),y,w//2,h//2),self.capacity)
+        self.se=Quadtree(Rectangle(x+(w//2),y+(h//2),w//2,h//2),self.capacity)
+    
+    def printPoints(self) :
+        for x in self.points :
+            x.print()

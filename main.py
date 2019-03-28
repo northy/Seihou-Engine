@@ -1,17 +1,11 @@
 from quadtree import *
 
 qtree=Quadtree(Rectangle(0,0,200,200),4)
-qtree.addPoint(Point(25,25))
-print(qtree.points)
-qtree.addPoint(Point(125,25))
-print(qtree.points)
-qtree.addPoint(Point(25,125))
-print(qtree.points)
-qtree.addPoint(Point(125,125))
-print(qtree.points)
-qtree.addPoint(Point(120,120))
-print(qtree.points,qtree.isSplitted)
-print(qtree.nw.points)
-print(qtree.ne.points)
-print(qtree.sw.points)
-print(qtree.se.points)
+qtree._split()
+
+while True :
+    x,y=map(int,input("x y = ").split())
+    print("NW Contains:",qtree.nw.contains(Point(x,y)))
+    print("NE Contains:",qtree.ne.contains(Point(x,y)))
+    print("SW Contains:",qtree.sw.contains(Point(x,y)))
+    print("SE Contains:",qtree.se.contains(Point(x,y)))
