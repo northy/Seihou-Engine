@@ -1,7 +1,13 @@
 from quadtree import *
 
-qtree=Quadtree(Rectangle(0,0,200,200),4)
-qtree._split()
+
+qtree=Quadtree(Rectangle(Point(0,0),200,200),4)
+
+qtree.addPoint(Point(20,20))
+qtree.addPoint(Point(20,20))
+qtree.addPoint(Point(20,20))
+qtree.addPoint(Point(20,20))
+qtree.addPoint(Point(20,20))
 
 while True :
     x,y=map(int,input("x y = ").split())
