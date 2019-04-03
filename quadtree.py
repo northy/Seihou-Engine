@@ -4,6 +4,7 @@ class Quadtree :
     def __init__(self,boundary,capacity) :
         self.boundary=boundary
         self.points=[]
+        self.rectangles=[]
         self.capacity=capacity
         self.isSplitted=False
         self.nw=None
@@ -11,7 +12,7 @@ class Quadtree :
         self.sw=None
         self.se=None
 
-    def getAllPoints(self) :
+    def getAllPoints(self) -> list:
         if not(self.isSplitted) :
             return self.points
         else :
@@ -22,13 +23,71 @@ class Quadtree :
             points+=self.se.getAllPoints()
             return points
 
-    def addPoint(self,point) :
+    def getAllRectangles(self) -> list:
+        if not(self.isSplitted) :
+            return self.rectangles
+        else :
+            rectangles=[]
+            rectangles+=self.nw.getAllRectangles()
+            rectangles+=self.sw.getAllRectangles()
+            rectangles+=self.ne.getAllRectangles()
+            rectangles+=self.se.getAllRectangles()
+            return rectangles
+
+    def __exceededCapacity(self) -> bool:
+        return (len(self.points)+len(self.rectangles))>=self.capacity
+
+    def addRectangle(self,rect:Rectangle) -> bool:
+        if not(self.containsRectangle(rect)) : return False
+        if self.isSplitted :
+            added=False
+            added=added or self.nw.addRectangle(rect)
+            added=added or self.sw.addRectangle(rect)
+            added=added or self.ne.addRectangle(rect)
+            added=added or self.se.addRectangle(rect)
+            return added
+        else :
+            if not(self.__exceededCapacity()) :
+                self.rectangles.append(rect)
+            else :
+                self.__split()
+                self.nw.addRectangle(rect)
+                self.sw.addRectangle(rect)
+                self.ne.addRectangle(rect)
+                self.se.addRectangle(rect)
+        return True
+
+    def __exceededCapacity(self) -> bool:
+        return (len(self.points)+len(self.rectangles))>=self.capacity
+
+    def addRectangle(self,rect:Rectangle) -> bool:
+        if not(self.containsRectangle(rect)) : return False
+        if self.isSplitted :
+            added=False
+            added=added or self.nw.addRectangle(rect)
+            added=added or self.sw.addRectangle(rect)
+            added=added or self.ne.addRectangle(rect)
+            added=added or self.se.addRectangle(rect)
+            return added
+        else :
+            if not(self.__exceededCapacity()) :
+                self.rectangles.append(rect)
+            else :
+                self.__split()
+                self.nw.addRectangle(rect)
+                self.sw.addRectangle(rect)
+                self.ne.addRectangle(rect)
+                self.se.addRectangle(rect)
+        return True
+
+    def addPoint(self,point:Point) -> bool:
         if not(self.containsPoint(point)) : return False
         if self.isSplitted :
             added=False
             if self.nw.addPoint(point) or self.ne.addPoint(point) or self.sw.addPoint(point) or self.se.addPoint(point): added=True
+            return added
         else :
-            if len(self.points)<self.capacity :
+            if not(self.__exceededCapacity()) :
                 self.points.append(point)
             else :
                 self.__split()
@@ -36,15 +95,9 @@ class Quadtree :
                 self.ne.addPoint(point)
                 self.sw.addPoint(point)
                 self.se.addPoint(point)
-                for p in self.points :
-                    self.nw.addPoint(p)
-                    self.ne.addPoint(p)
-                    self.sw.addPoint(p)
-                    self.se.addPoint(p)
-                self.points=[]
         return True
 
-    def containsPoint(self,point) :
+    def containsPoint(self,point:Point) -> bool:
         x=self.boundary.pos.x
         y=self.boundary.pos.y
         w=self.boundary.w
@@ -55,34 +108,18 @@ class Quadtree :
             return False
 
     def containsRectangle(self,rect:Rectangle) -> bool:
-        rtl=(rect.pos.x,rect.pos.y)
-        rtr=(rect.pos.x+rect.w,rect.pos.y)
-        rbl=(rect.pos.x,rect.pos.y+rect.h)
-        rbr=(rect.pos.x+rect.w,rect.pos.y+rect.h)
-        sx=self.boundary.pos.x
-        sy=self.boundary.pos.y
-        sw=self.boundary.w
-        sh=self.boundary.h
-
-        if (rbr[0]>=sx and rbr[0]<sx+sw) and (rbr[1]>=sy and rbr[1]<sy+sh) :
-            return True
-        if (rbl[0]>=sx and rbl[0]<sx+sw) and (rbl[1]>=sy and rbl[1]<sy+sh) :
-            return True
-        if (rtr[0]>=sx and rtr[0]<sx+sw) and (rtr[1]>=sy and rtr[1]<sy+sh) :
-            return True
-        if (rtl[0]>=sx and rtl[0]<sx+sw) and (rtl[1]>=sy and rtl[1]<sy+sh) :
-            return True
+        return self.boundary.collides(rect)
 
     def queryRectangle(self, rect:Rectangle) -> list :
         if not(self.containsRectangle(rect)) : return []
-        points=[]
+        res=[]
 
         if self.isSplitted :
-            points+=self.nw.queryRectangle(rect)
-            points+=self.ne.queryRectangle(rect)
-            points+=self.sw.queryRectangle(rect)
-            points+=self.se.queryRectangle(rect)
-            return points
+            res+=self.nw.queryRectangle(rect)
+            res+=self.ne.queryRectangle(rect)
+            res+=self.sw.queryRectangle(rect)
+            res+=self.se.queryRectangle(rect)
+            return res
 
         rx=rect.pos.x
         ry=rect.pos.y
@@ -94,9 +131,13 @@ class Quadtree :
             py=p.y
 
             if (px>=rx and px<rx+rw) and (py>=ry and py<ry+rh) :
-                points.append(p)
+                res.append(p)
 
-        return points
+        for r in self.rectangles :
+            if (rect.collides(r)) :
+                res.append(r)
+
+        return res
 
     def __split(self) :
         self.isSplitted=True
@@ -108,6 +149,18 @@ class Quadtree :
         self.sw=Quadtree(Rectangle(Point(x,y+(h//2)),w//2,h//2),self.capacity)
         self.ne=Quadtree(Rectangle(Point(x+(w//2),y),w//2,h//2),self.capacity)
         self.se=Quadtree(Rectangle(Point(x+(w//2),y+(h//2)),w//2,h//2),self.capacity)
+        for p in self.points :
+            self.nw.addPoint(p)
+            self.ne.addPoint(p)
+            self.sw.addPoint(p)
+            self.se.addPoint(p)
+        self.points=[]
+        for r in self.rectangles :
+            self.nw.addRectangle(r)
+            self.ne.addRectangle(r)
+            self.sw.addRectangle(r)
+            self.se.addRectangle(r)
+        self.rectangles=[]
 
     def printPoints(self) :
         for x in self.points :

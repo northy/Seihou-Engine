@@ -30,12 +30,18 @@ while True :
     for event in pygame.event.get() :
         if event.type == pygame.QUIT : sys.exit()
         if event.type==pygame.MOUSEBUTTONDOWN :
-            qtree.addPoint(Point(mouseX,mouseY))
+            #qtree.addPoint(Point(mouseX,mouseY))
+            qtree.addRectangle(Rectangle(Point(mouseX,mouseY),20,20))
 
     screen.fill(black)
 
+    drawLines(screen,qtree)
+
     for p in qtree.getAllPoints() :
         p.draw(screen,white,2)
+
+    for r in qtree.getAllRectangles() :
+        r.draw(screen,white,2)
 
     mouseRectangle=Rectangle(Point(mouseX-20,mouseY-20),40,40)
 
@@ -43,8 +49,6 @@ while True :
 
     for p in qtree.queryRectangle(mouseRectangle) :
         p.draw(screen,green,2)
-
-    drawLines(screen,qtree)
 
     pygame.display.flip()
 
