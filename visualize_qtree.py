@@ -1,5 +1,5 @@
 import sys, pygame
-from quadtree import *
+from bin.quadtree import *
 
 black = 0,0,0
 white = 255,255,255
@@ -8,7 +8,7 @@ red = 255,0,0
 
 pygame.init()
 
-size = width, height = 400,400
+size = width, height = 600,800
 
 qtree = Quadtree(Rectangle(0,0,width,height),4)
 
