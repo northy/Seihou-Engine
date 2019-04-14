@@ -25,9 +25,20 @@ font = pygame.font.Font(None, 30)
 
 player = Player()
 
-while True :
-    mouseX,mouseY=pygame.mouse.get_pos()
+entity1,entity2,entity3,entity4,entity5=Entity(),Entity(),Entity(),Entity(),Entity()
+entity1.rect=Rectangle(0,0,20,40)
+entity2.rect=Rectangle(200,90,20,40)
+entity3.rect=Rectangle(120,350,20,40)
+entity4.rect=Rectangle(350,120,20,40)
+entity5.rect=Rectangle(90,200,20,40)
 
+qtree.addEntity(entity1)
+qtree.addEntity(entity2)
+qtree.addEntity(entity3)
+qtree.addEntity(entity4)
+qtree.addEntity(entity5)
+
+while True :
     for event in pygame.event.get() :
         if event.type == pygame.QUIT : pygame.quit(); sys.exit()
 
@@ -42,8 +53,7 @@ while True :
 
     game.fill(white)
 
-    surf = pygame.Surface((255,255))
-    surf.fill((0,255,0))  
+    qtree.drawLines(game,black)
 
     player.draw(game)
 

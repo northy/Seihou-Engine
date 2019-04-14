@@ -31,18 +31,20 @@ while True :
     screen.fill(black)
 
     if leftClick and rightClick :
-        qtree.addRectangle(Rectangle(min(leftClick[0],rightClick[0]),min(leftClick[1],rightClick[1]),abs(leftClick[0]-rightClick[0]),abs(leftClick[1]-rightClick[1])))
+        entt=Entity()
+        entt.rect=Rectangle(min(leftClick[0],rightClick[0]),min(leftClick[1],rightClick[1]),abs(leftClick[0]-rightClick[0]),abs(leftClick[1]-rightClick[1]))
+        qtree.addEntity(entt)
         leftClick,rightClick=None,None
 
-    for r in qtree.getAllRectangles() :
-        r.draw(screen,white,2)
+    for r in qtree.getAllEntities() :
+        r.rect.draw(screen,white,2)
 
     mouseRectangle=Rectangle(mouseX-20,mouseY-20,40,40)
 
     mouseRectangle.draw(screen,green,2)
 
     for p in qtree.queryRectangle(mouseRectangle) :
-        p.draw(screen,green,2)
+        p.rect.draw(screen,green,2)
 
     qtree.drawLines(screen,white)
 

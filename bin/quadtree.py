@@ -2,9 +2,10 @@ from bin.shapes import *
 from bin.entities import *
 
 class Quadtree(object) :
-    def __init__(self,boundary:Rectangle,capacity:int,__ob:Rectangle=None) :
+    def __init__(self,boundary:Rectangle,capacity:int,maximumSplits:int=4,curSplits:int=0) :
         self.boundary=boundary
-        self.__ob= boundary if type(__ob)!="None" else __ob
+        self.curSplits=curSplits
+        self.maximumSplits=maximumSplits
         self.entities=[]
         self.capacity=capacity
         self.isSplitted=False
@@ -31,7 +32,7 @@ class Quadtree(object) :
 
     # checks if it can continue splitting or if the split size is too low
     def __exceededSplitLimit(self) :
-        return self.boundary.x//2 < __ob.x*0.1 or self.boundary.y//2 < __ob.y*0.1
+        return self.curSplits==self.maximumSplits
 
     # adds an entity on the quadtree
     def addEntity(self,entt:Entity) -> bool:
@@ -43,7 +44,7 @@ class Quadtree(object) :
             add4=self.se.addEntity(entt)
             return add1 or add2 or add3 or add4
         else :
-            if not(self.__exceededCapacity()) or __exceededSplitLimit():
+            if not(self.__exceededCapacity()) or self.__exceededSplitLimit():
                 self.entities.append(entt)
             else :
                 self.__split()
@@ -70,7 +71,7 @@ class Quadtree(object) :
             return res
         else :
             for r in self.entities :
-                if (entt.rect.collides(r)) :
+                if (rect.collides(r.rect)) :
                     res.append(r)
 
         return res
@@ -82,10 +83,10 @@ class Quadtree(object) :
         y=self.boundary.y
         w=self.boundary.w
         h=self.boundary.h
-        self.nw=Quadtree(Sprite(x,y,w//2,h//2),self.capacity,__ob)
-        self.sw=Quadtree(Sprite(x,y+(h//2),w//2,h//2),self.capacity,__ob)
-        self.ne=Quadtree(Sprite(x+(w//2),y,w//2,h//2),self.capacity,__ob)
-        self.se=Quadtree(Sprite(x+(w//2),y+(h//2),w//2,h//2),self.capacity,__ob)
+        self.nw=Quadtree(Rectangle(x,y,w//2,h//2),self.capacity,self.maximumSplits,self.curSplits+1)
+        self.sw=Quadtree(Rectangle(x,y+(h//2),w//2,h//2),self.capacity,self.maximumSplits,self.curSplits+1)
+        self.ne=Quadtree(Rectangle(x+(w//2),y,w//2,h//2),self.capacity,self.maximumSplits,self.curSplits+1)
+        self.se=Quadtree(Rectangle(x+(w//2),y+(h//2),w//2,h//2),self.capacity,self.maximumSplits,self.curSplits+1)
         for r in self.entities :
             self.nw.addEntity(r)
             self.ne.addEntity(r)
