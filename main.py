@@ -1,5 +1,6 @@
 import os, sys, pygame
-from bin.quadtree import *
+sys.path.append("bin/")
+from quadtree import *
 
 black = 0,0,0
 white = 255,255,255
@@ -38,6 +39,8 @@ qtree.addEntity(entity3)
 qtree.addEntity(entity4)
 qtree.addEntity(entity5)
 
+c = Circle(5)
+
 while True :
     for event in pygame.event.get() :
         if event.type == pygame.QUIT : pygame.quit(); sys.exit()
@@ -56,6 +59,7 @@ while True :
     qtree.drawLines(game,black)
 
     player.draw(game)
+    player.drawHitbox(game)
 
     fps = font.render(str(int(clock.get_fps())), True, white)
     display.blit(fps, (610, 460))

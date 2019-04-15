@@ -1,5 +1,5 @@
 import pygame
-from bin.shapes import *
+from shapes import *
 
 class Entity(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -31,6 +31,7 @@ class Player(Entity) :
         self.image = pygame.Surface((45,50))
         self.image.fill((0,255,0))
         self.rect = Rectangle(0,0,45,50)
+        self.hitbox = Circle(5)
         self.moveSpeed=1
 
     # moves left by the move speed
@@ -62,3 +63,6 @@ class Player(Entity) :
             y=0
         
         self.move(x,y)
+
+    def drawHitbox(self,surface:pygame.surface.Surface) :
+        self.hitbox.draw(surface,(self.rect.getX()+self.rect.getW()//2,self.rect.getY()+self.rect.getH()//2))

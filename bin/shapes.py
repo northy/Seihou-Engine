@@ -58,3 +58,13 @@ class Rectangle(pygame.rect.Rect) :
 
     def getH(self) :
         return self.tmpH
+
+class Circle(object) :
+    def __init__(self,r:int,color:tuple=(255,0,0)) :
+        self.r=r
+        self.width=r*2
+        self.height=r*2
+        self.color=color
+    
+    def draw(self,surf:pygame.surface.Surface,pos:tuple,width:int=0) :
+        pygame.draw.circle(surf,self.color,pos,self.r,width)
