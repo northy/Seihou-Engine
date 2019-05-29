@@ -41,6 +41,14 @@ qtree.addEntity(entity5)
 
 c = Circle(5)
 
+b = SeekingBullet()
+b.image=pygame.Surface((20,20))
+b.rect=Rectangle(0,0,20,20)
+
+e = Entity()
+e.image=pygame.Surface((5,5))
+e.rect=Rectangle(0,0,5,5)
+
 while True :
     for event in pygame.event.get() :
         if event.type == pygame.QUIT : pygame.quit(); sys.exit()
@@ -60,6 +68,12 @@ while True :
 
     player.draw(game)
     player.drawHitbox(game)
+
+    e.go(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
+    e.draw(game)
+
+    b.seek(e)
+    b.draw(game)
 
     fps = font.render(str(int(clock.get_fps())), True, white)
     display.blit(fps, (610, 460))
