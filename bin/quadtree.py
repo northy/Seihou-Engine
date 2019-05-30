@@ -1,6 +1,6 @@
 import sys
-from shapes import *
-from entities import *
+from bin.shapes import *
+from bin.entities import *
 
 class Quadtree(object) :
     def __init__(self,boundary:Rectangle,capacity:int,maximumSplits:int=4,curSplits:int=0) :

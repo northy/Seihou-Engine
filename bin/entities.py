@@ -1,7 +1,7 @@
 import pygame
-from shapes import *
+from bin.shapes import *
 import numpy as np
-from components import *
+from bin.components import *
 from timeit import default_timer as timer
 
 class Entity(pygame.sprite.Sprite) :

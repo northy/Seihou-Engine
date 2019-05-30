@@ -1,6 +1,5 @@
 import pygame
-from entities import *
-import copy
+from bin.entities import *
 
 class bulletFactory(object) :
     def __init__(self) :
