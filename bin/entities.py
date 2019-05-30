@@ -1,5 +1,6 @@
 import pygame
 from shapes import *
+import numpy as np
 from components import *
 
 class Entity(pygame.sprite.Sprite) :
@@ -71,30 +72,30 @@ class Player(Entity) :
 class Bullet(Entity) :
     def __init__(self) :
         Entity.__init__(self)
-        self.velocity=Vector2D(0,0)
+        self.velocity=None
     
-    def isOutOfBounds(self,boundary:Rectangle) :
-        return True if not(boundary.collides(this.rect)) else False
+    def move(self) :
+        super().move(self.velocity[0],self.velocity[1])
+
+    def isOutOfBounds(self,boundary:Rectangle) -> bool :
+        return True if not(boundary.collides(self.rect)) else False
 
 class SeekingBullet(Bullet) :
     def __init__(self) :
         Bullet.__init__(self)
-        self.maxVelocity=Vector2D(1,1)
-        self.maxForce=Vector2D(0.01,0.01)
+        self.maxVelocity=None
+        self.maxForce=None
+
+    def move(self,other:Entity) :
+        if (self.rect.getY()+self.rect.getW()<other.rect.getY()+other.rect.getH()) :
+            self.seek(other)
+        Bullet.move(self)
     
-    def seek(self,other) :
-        desiredVelocity = Vector2D(other.rect.getX(),other.rect.getY())
-        print(desiredVelocity.vec,"x,y")
-        desiredVelocity = desiredVelocity.sub(Vector2D(self.rect.getX(),self.rect.getY()))
-        print(desiredVelocity.vec,"sub")
-        desiredVelocity = desiredVelocity.normalize()
-        print(desiredVelocity.vec,"norm")
-        desiredVelocity = desiredVelocity.multiply(self.maxVelocity)
-        print(desiredVelocity.vec,"mul")
+    def seek(self,other:Entity) :
+        selfpos = np.array([self.rect.getX(),self.rect.getY()])
+        otherpos = np.array([other.rect.getX(),other.rect.getY()])
 
-        steering = Vector2D().add(desiredVelocity).sub(self.velocity)
-        steering = steering.truncate(self.maxForce)
+        desiredVelocity = ((otherpos-selfpos)/np.linalg.norm(otherpos-selfpos)) * self.maxVelocity
+        steering = desiredVelocity
 
-        velocity = Vector2D().add(steering).truncate(self.maxVelocity)
-
-        self.move(velocity.vec[0],velocity.vec[1])
+        self.velocity = truncate(steering + self.velocity,self.maxVelocity)

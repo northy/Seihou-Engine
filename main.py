@@ -1,6 +1,7 @@
 import os, sys, pygame
 sys.path.append("bin/")
 from quadtree import *
+import numpy as np
 
 black = 0,0,0
 white = 255,255,255
@@ -44,6 +45,9 @@ c = Circle(5)
 b = SeekingBullet()
 b.image=pygame.Surface((20,20))
 b.rect=Rectangle(0,0,20,20)
+b.velocity=np.array([0,0])
+b.maxVelocity=3
+b.maxForce=1
 
 e = Entity()
 e.image=pygame.Surface((5,5))
@@ -72,7 +76,7 @@ while True :
     e.go(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
     e.draw(game)
 
-    b.seek(e)
+    b.move(e)
     b.draw(game)
 
     fps = font.render(str(int(clock.get_fps())), True, white)
