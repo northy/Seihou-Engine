@@ -10,6 +10,10 @@ class Rectangle(pygame.rect.Rect) :
         self.tmpW=w
         self.h=h
         self.tmpH=h
+    
+    def copy(self) :
+        new = Rectangle(self.getX(),self.getY(),self.getW(),self.getH())
+        return new
 
     # prints information about the rectangle
     def print(self) :

@@ -2,6 +2,7 @@ import os, sys, pygame
 sys.path.append("bin/")
 from quadtree import *
 import numpy as np
+from factories import *
 
 black = 0,0,0
 white = 255,255,255
@@ -26,32 +27,26 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 30)
 
 player = Player()
+player.hitbox = Circle(5)
+player.image = pygame.Surface((20,30))
+player.rect = Rectangle(0,0,20,30)
+player.moveSpeed = 15
 
-entity1,entity2,entity3,entity4,entity5=Entity(),Entity(),Entity(),Entity(),Entity()
-entity1.rect=Rectangle(0,0,20,40)
-entity2.rect=Rectangle(200,90,20,40)
-entity3.rect=Rectangle(120,350,20,40)
-entity4.rect=Rectangle(350,120,20,40)
-entity5.rect=Rectangle(90,200,20,40)
+b = Bullet()
+b.image=pygame.Surface((5,5))
+b.rect=Rectangle(0,0,5,5)
+b.velocity = np.array([2,2])
 
-qtree.addEntity(entity1)
-qtree.addEntity(entity2)
-qtree.addEntity(entity3)
-qtree.addEntity(entity4)
-qtree.addEntity(entity5)
+bp = bulletFactory()
+bp.addBullet(b)
 
-c = Circle(5)
+enemy=Enemy()
+enemy.image = pygame.Surface((10,10))
+enemy.rect = Rectangle(0,0,10,10)
+enemy.lifes=0
+enemy.pattern=[[1,0,[bp]]]
 
-b = SeekingBullet()
-b.image=pygame.Surface((20,20))
-b.rect=Rectangle(0,0,20,20)
-b.velocity=np.array([0,0])
-b.maxVelocity=3
-b.maxForce=1
-
-e = Entity()
-e.image=pygame.Surface((5,5))
-e.rect=Rectangle(0,0,5,5)
+group=pygame.sprite.Group()
 
 while True :
     for event in pygame.event.get() :
@@ -70,14 +65,15 @@ while True :
 
     qtree.drawLines(game,black)
 
+    enemy.think(group)
+    enemy.draw(game)
+
+    for bul in group :
+        bul.move()
+        bul.draw(game)
+
     player.draw(game)
     player.drawHitbox(game)
-
-    e.go(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
-    e.draw(game)
-
-    b.move(e)
-    b.draw(game)
 
     fps = font.render(str(int(clock.get_fps())), True, white)
     display.blit(fps, (610, 460))
