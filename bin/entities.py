@@ -1,6 +1,6 @@
-import pygame
-from bin.shapes import *
+import pygame,random
 import numpy as np
+from bin.shapes import *
 from bin.components import *
 from timeit import default_timer as timer
 
@@ -108,33 +108,39 @@ class SeekingBullet(Bullet) :
 class Enemy(Entity) :
     def __init__(self) :
         Entity.__init__(self)
-        self.targetPos = None #np array
+        self.targetPos = np.array([]) #np array
         self.pattern=[] #pattern[x][0] = delay for fresh start(int); pattern[x][1] = delay between factories spawn; pattern[x][2] = [bulletFactory]
         self.lifes=None #int
         self.step=0
         self.waitFor=0
-        self.velocity=None #numpy array
+        self.velocity=np.array([0,0]) #numpy array
         self.maxVelocity=None #int
         self.maxForce=None #int
         self.lastSurge=None #timer object
 
-    def think(self, bullets:pygame.sprite.Group) :
-        if (self.targetPos!=None) :
+    def think(self, bullets:pygame.sprite.Group,gameW:int,gameH:int) :
+        if (self.lastSurge!=None and timer()-self.lastSurge<self.waitFor) :
+            return
+        if (self.targetPos.size!=0) :
             self.move()
-            if (self.rect.x==self.targetPos[0] and self.rect.y==self.targetPos[1]) :
-                self.targetPos=None
+            if (abs(self.velocity[0])<0.0005 and abs(self.velocity[1])<0.0005) :
+                self.waitFor=self.pattern[self.lifes][0]
+                self.lastSurge=timer()
+                self.targetPos=np.array([])
         else :
             if (self.step==len(self.pattern[self.lifes][2])) :
                 self.step=0
                 self.waitFor=self.pattern[self.lifes][0]
                 self.lastSurge=timer()
+                posa=random.randint(1,gameW-self.rect.getW())
+                posb=random.randint(1,gameH//2)
+                self.targetPos=np.array([posa,posb])
                 #TODO: reset circle
-            if (self.lastSurge!=None and timer()-self.lastSurge<self.waitFor) :
-                return
             
-            self.pattern[self.lifes][2][self.step].spawn(bullets)
+            self.pattern[self.lifes][2][self.step].spawn(bullets,self.rect.getX(),self.rect.getY())
             self.waitFor=self.pattern[self.lifes][1]
             self.step+=1
+            self.lastSurge=timer()
     
     def move(self) :
         selfpos = np.array([self.rect.getX(),self.rect.getY()])

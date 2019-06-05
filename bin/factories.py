@@ -3,11 +3,13 @@ from bin.entities import *
 
 class bulletFactory(object) :
     def __init__(self) :
-        self.blueprints=[]
+        self.prototypes=[]
     
     def addBullet(self,b:Bullet) :
-        self.blueprints.append(b)
+        self.prototypes.append(b)
         
-    def spawn(self,g:pygame.sprite.Group) :
-        for b in self.blueprints :
-            g.add(b.copy())
+    def spawn(self,g:pygame.sprite.Group,x:int,y:int) :
+        for b in self.prototypes :
+            bul=b.copy()
+            bul.go(bul.rect.getX()+x,bul.rect.getY()+y)
+            g.add(bul)

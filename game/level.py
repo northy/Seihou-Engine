@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import random
 from bin.colors import *
 from bin.components import *
 from bin.factories import *
@@ -29,7 +30,9 @@ class Level0() :
         self.enemy.image = pygame.Surface((10,10))
         self.enemy.rect = Rectangle(0,0,10,10)
         self.enemy.lifes=0
-        self.enemy.pattern=[[1,0,[self.bp]]]
+        self.enemy.pattern=[[1,1,[self.bp]]]
+        self.enemy.maxForce=2
+        self.enemy.maxVelocity=3
 
         self.group=pygame.sprite.Group()
 
@@ -43,7 +46,7 @@ class Level0() :
 
         self.game.fill(white)
 
-        self.enemy.think(self.group)
+        self.enemy.think(self.group,self.qtree.boundary.getW(),self.qtree.boundary.getH())
         self.enemy.draw(self.game)
 
         self.player.draw(self.game)
