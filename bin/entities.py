@@ -217,21 +217,21 @@ class Enemy(Entity) :
         if (self.targetPos.size!=0) :
             self.move()
             if (abs(self.velocity[0])<0.0005 and abs(self.velocity[1])<0.0005) :
-                self.waitFor=self.pattern[self.lifes][0]
+                self.waitFor=self.pattern[self.lifes-1][0]
                 self.lastSurge=timer()
                 self.targetPos=np.array([])
         else :
-            if (self.step==len(self.pattern[self.lifes][2])) :
+            if (self.step==len(self.pattern[self.lifes-1][2])) :
                 self.step=0
-                self.waitFor=self.pattern[self.lifes][0]
+                self.waitFor=self.pattern[self.lifes-1][0]
                 self.lastSurge=timer()
                 posa=random.randint(1,gameW-self.rect.getW())
                 posb=random.randint(1,gameH//2)
                 self.targetPos=np.array([posa,posb])
                 #TODO: reset circle
 
-            self.pattern[self.lifes][2][self.step].spawn(bullets,self.rect.getX(),self.rect.getY())
-            self.waitFor=self.pattern[self.lifes][1]
+            self.pattern[self.lifes-1][2][self.step].spawn(bullets,self.rect.getX(),self.rect.getY())
+            self.waitFor=self.pattern[self.lifes-1][1]
             self.step+=1
             self.lastSurge=timer()
 
@@ -246,6 +246,4 @@ class Enemy(Entity) :
         super().move(self.velocity[0],self.velocity[1])
 
     def isDead(self) -> bool :
-        if self.lifes==-1 :
-            return True
-        return False
+        return True if self.lifes<=0 else False

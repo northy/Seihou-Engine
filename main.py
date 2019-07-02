@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import os, sys, pygame
 from game.handler import *
+import pygame
 
 pygame.init()
 

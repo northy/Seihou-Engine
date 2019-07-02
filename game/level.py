@@ -54,8 +54,10 @@ class Level(object) :
                 self.photoTimer=timer()
             if keys[pygame.K_UP] :
                 self.photoRect.setY(self.photoRect.getY()-1)
+            if keys[pygame.K_DOWN] :
+                self.photoRect.setY(self.photoRect.getY()+1)
             if keys[pygame.K_LEFT] :
-                self.photoRect.setX(self.photoRect.getX()-1)
+                self.photoRect.setX(self.photoRect.getX()-2)
             if keys[pygame.K_RIGHT] :
                 self.photoRect.setX(self.photoRect.getX()+1)
         else :
@@ -95,7 +97,7 @@ class Level(object) :
         if (self.powerCount<100 and timer()-self.lastPowerGain>=(self.powerEachXSecs if not(self.powerCharging) else self.powerEachXSecs/3)) :
             self.powerCount+=1
             self.lastPowerGain=timer()
-        drawText(self.game,f"{self.powerCount}%",10,(self.player.rect.getX()+self.player.rect.getW()+5,self.player.rect.getY()-5),color=red)
+        drawText(self.game,f"{self.powerCount}%",12,(self.player.rect.getX()+self.player.rect.getW()+5,self.player.rect.getY()-5),color=red)
         self.player.draw(self.game)
         if (keys[pygame.K_LSHIFT]) : self.player.drawHitbox(self.game)
 
@@ -210,7 +212,7 @@ class Level0(Level) :
         self.enemy=Enemy()
         self.enemy.image = pygame.Surface((10,10))
         self.enemy.rect = Rectangle(0,0,10,10)
-        self.enemy.lifes=0
+        self.enemy.lifes=1
         self.enemy.pattern=[[1,0,[st,ts,seek]]]
         self.enemy.maxForce=2
         self.enemy.maxVelocity=3
