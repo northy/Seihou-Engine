@@ -93,7 +93,8 @@ class Level(object) :
         self.enemy.draw(self.game)
 
         #player processing
-        if len(self.qtree.queryRectangle(self.player.hitboxRect))!=0 : return 2
+        for x in self.qtree.queryRectangle(self.player.hitboxRect) :
+            if (self.player.pixelPerfectHitboxCollision(x)) : return 2
         if (self.powerCount<100 and timer()-self.lastPowerGain>=(self.powerEachXSecs if not(self.powerCharging) else self.powerEachXSecs/3)) :
             self.powerCount+=1
             self.lastPowerGain=timer()
@@ -109,10 +110,11 @@ class Level0(Level) :
         
         #########CREATE PLAYER#########
         self.player = Player()
-        self.player.hitbox = pygame.Surface((10,10))
-        self.player.hitbox.fill(red)
+        hb = pygame.Surface((10,10))
+        hb.fill(red)
+        self.player.hitbox = Sprite(hb)
         self.player.hitboxRect = Rectangle(0,0,10,10)
-        self.player.image = pygame.Surface((20,30))
+        self.player.sprite = Sprite(pygame.Surface((20,30)))
         self.player.rect = Rectangle(0,0,20,30)
         self.player.moveSpeed = 4
         self.player.rect.setX(gWidth/2)
@@ -123,68 +125,68 @@ class Level0(Level) :
         #########CREATE ENEMY#########
         #Patterns
         se = Bullet()
-        se.image=pygame.Surface((5,5))
+        se.sprite=Sprite(pygame.Surface((5,5)))
         se.rect=Rectangle(0,0,5,5)
         se.velocity = np.array([2,2])
 
         ne = Bullet()
-        ne.image=pygame.Surface((5,5))
+        ne.sprite=Sprite(pygame.Surface((5,5)))
         ne.rect=Rectangle(0,0,5,5)
         ne.velocity = np.array([2,-2])
 
         sw = Bullet()
-        sw.image=pygame.Surface((5,5))
+        sw.sprite=Sprite(pygame.Surface((5,5)))
         sw.rect=Rectangle(0,0,5,5)
         sw.velocity = np.array([-2,2])
 
         nw = Bullet()
-        nw.image=pygame.Surface((5,5))
+        nw.sprite=Sprite(pygame.Surface((5,5)))
         nw.rect=Rectangle(0,0,5,5)
         nw.velocity = np.array([-2,-2])
 
         n = Bullet()
-        n.image=pygame.Surface((5,5))
+        n.sprite=Sprite(pygame.Surface((5,5)))
         n.rect=Rectangle(0,0,5,5)
         n.velocity = np.array([0,-2])
 
         s = Bullet()
-        s.image=pygame.Surface((5,5))
+        s.sprite=Sprite(pygame.Surface((5,5)))
         s.rect=Rectangle(0,0,5,5)
         s.velocity = np.array([0,2])
 
         e = Bullet()
-        e.image=pygame.Surface((5,5))
+        e.sprite=Sprite(pygame.Surface((5,5)))
         e.rect=Rectangle(0,0,5,5)
         e.velocity = np.array([2,0])
 
         w = Bullet()
-        w.image=pygame.Surface((5,5))
+        w.sprite=Sprite(pygame.Surface((5,5)))
         w.rect=Rectangle(0,0,5,5)
         w.velocity = np.array([-2,0])
 
         ns = UpSeekingBullet(self.player)
-        ns.image = pygame.Surface((5,5))
+        ns.sprite = Sprite(pygame.Surface((5,5)))
         ns.rect = Rectangle(0,0,5,5)
         ns.velocity=[0,-1]
         ns.maxVelocity = 2
         ns.maxForce = 3
 
         ss = DownSeekingBullet(self.player)
-        ss.image = pygame.Surface((5,5))
+        ss.sprite = Sprite(pygame.Surface((5,5)))
         ss.rect = Rectangle(0,0,5,5)
         ss.velocity=[0,1]
         ss.maxVelocity = 2
         ss.maxForce = 3
 
         es = RightSeekingBullet(self.player)
-        es.image = pygame.Surface((5,5))
+        es.sprite = Sprite(pygame.Surface((5,5)))
         es.rect = Rectangle(0,0,5,5)
         es.velocity=[1,0]
         es.maxVelocity = 2
         es.maxForce = 3
 
         ws = LeftSeekingBullet(self.player)
-        ws.image = pygame.Surface((5,5))
+        ws.sprite = Sprite(pygame.Surface((5,5)))
         ws.rect = Rectangle(0,0,5,5)
         ws.velocity=[-1,0]
         ws.maxVelocity = 2
@@ -210,7 +212,7 @@ class Level0(Level) :
 
         #Enemy
         self.enemy=Enemy()
-        self.enemy.image = pygame.Surface((10,10))
+        self.enemy.sprite = Sprite(pygame.Surface((10,10)))
         self.enemy.rect = Rectangle(0,0,10,10)
         self.enemy.lifes=1
         self.enemy.pattern=[[1,0,[st,ts,seek]]]

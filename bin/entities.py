@@ -7,7 +7,7 @@ from timeit import default_timer as timer
 class Entity(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
-        self.image = None #pygame Surface
+        self.sprite = None #Sprite
         self.rect = None #Rectangle
 
     # jumps to (x,y) coordinates
@@ -22,7 +22,7 @@ class Entity(pygame.sprite.Sprite) :
 
     # draws the entity in the surface
     def draw(self,surface:pygame.surface.Surface) :
-        surface.blit(self.image,self.rect)
+        surface.blit(self.sprite.get(),self.rect)
 
     def print(self) :
         print("Entity at: ")
@@ -31,7 +31,7 @@ class Entity(pygame.sprite.Sprite) :
 class Player(Entity) :
     def __init__(self) :
         Entity.__init__(self)
-        self.hitbox = None #Surface
+        self.hitbox = None #Sprite
         self.hitboxRect = None #Rectangle
         self.moveSpeed = None #int
         self.slow = False
@@ -77,7 +77,16 @@ class Player(Entity) :
         self.updateHitbox()
 
     def drawHitbox(self,surface:pygame.surface.Surface) :
-        surface.blit(self.hitbox,self.hitboxRect)
+        surface.blit(self.hitbox.get(),self.hitboxRect)
+    
+    def pixelPerfectHitboxCollision(self,other:Entity) -> bool :
+        ox=int(self.hitboxRect.x-other.rect.x)
+        oy=int(self.hitboxRect.y-other.rect.y)
+        sm=pygame.mask.from_surface(self.hitbox.get())
+        sm.invert()
+        om=pygame.mask.from_surface(other.sprite.getWithoutChanging()) if not(isinstance(other,Bullet)) else pygame.mask.from_surface(other.sprite.getAngledWithoutChanging(getDegree(np.array(other.velocity))))
+        om.invert()
+        return True if om.overlap(sm,(ox,oy))!=None else False
 
 class Bullet(Entity) :
     def __init__(self) :
@@ -87,7 +96,7 @@ class Bullet(Entity) :
     def copy(self) :
         new = Bullet()
         new.velocity=self.velocity
-        new.image=self.image
+        new.sprite=self.sprite
         new.rect=self.rect.copy()
         return new
 
@@ -96,6 +105,9 @@ class Bullet(Entity) :
 
     def isOutOfBounds(self,boundary:Rectangle) -> bool :
         return True if not(boundary.collides(self.rect)) else False
+    
+    def draw(self,surface:pygame.surface.Surface) :
+        surface.blit(self.sprite.getAngled(getDegree(np.array(self.velocity))),self.rect)
 
 class SeekingBullet(Bullet) :
     def __init__(self,target:Entity) :
@@ -107,7 +119,7 @@ class SeekingBullet(Bullet) :
     def copy(self) :
         new = SeekingBullet(self.target)
         new.velocity=self.velocity
-        new.image=self.image
+        new.sprite=self.sprite
         new.rect=self.rect.copy()
         new.maxVelocity=self.maxVelocity
         new.maxForce=self.maxForce
@@ -133,7 +145,7 @@ class DownSeekingBullet(SeekingBullet) :
     def copy(self) :
         new = DownSeekingBullet(self.target)
         new.velocity=self.velocity
-        new.image=self.image
+        new.sprite=self.sprite
         new.rect=self.rect.copy()
         new.maxVelocity=self.maxVelocity
         new.maxForce=self.maxForce
@@ -151,7 +163,7 @@ class UpSeekingBullet(SeekingBullet) :
     def copy(self) :
         new = UpSeekingBullet(self.target)
         new.velocity=self.velocity
-        new.image=self.image
+        new.sprite=self.sprite
         new.rect=self.rect.copy()
         new.maxVelocity=self.maxVelocity
         new.maxForce=self.maxForce
@@ -169,7 +181,7 @@ class LeftSeekingBullet(SeekingBullet) :
     def copy(self) :
         new = LeftSeekingBullet(self.target)
         new.velocity=self.velocity
-        new.image=self.image
+        new.sprite=self.sprite
         new.rect=self.rect.copy()
         new.maxVelocity=self.maxVelocity
         new.maxForce=self.maxForce
@@ -187,7 +199,7 @@ class RightSeekingBullet(SeekingBullet) :
     def copy(self) :
         new = RightSeekingBullet(self.target)
         new.velocity=self.velocity
-        new.image=self.image
+        new.sprite=self.sprite
         new.rect=self.rect.copy()
         new.maxVelocity=self.maxVelocity
         new.maxForce=self.maxForce
