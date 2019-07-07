@@ -1,5 +1,6 @@
 import numpy as np
 import pygame, os, sys
+from timeit import default_timer as timer
 
 def truncate(a,b) -> np.array :
     if np.linalg.norm(a)>b :
@@ -8,7 +9,10 @@ def truncate(a,b) -> np.array :
     return a
 
 def drawText(surface:pygame.surface.Surface,text:str,size:int,pos:tuple,color:tuple=(0,0,0),fontName:str=None) :
-    font = pygame.font.SysFont(fontName,size)
+    try :
+        font = pygame.font.Font(fontName,size)
+    except :
+        font = pygame.font.SysFont(fontName,size)
     render = font.render(text,True,color)
     surface.blit(render,pos)
 
@@ -29,10 +33,12 @@ def getDegree(vec:np.array) :
     return np.degrees(np.arctan2(*vec.T[::-1])) % 360.0
 
 class Sprite(object) :
-    def __init__(self,*image) :
+    def __init__(self,ct,*image) :
         self.current=None #Surface
         self.i=0
         self.imageList=[] #[Surface]
+        self.lastChange=None #Timer
+        self.changeTimer=ct #float
 
         for x in image :
             self.imageList.append(x)
@@ -51,8 +57,10 @@ class Sprite(object) :
         try :
             return self.current
         finally:
-            self.current=self.imageList[i]
-            i = 0 if i+1==len(self.imageList) else i+1
+            self.current=self.imageList[self.i]
+            if self.lastChange is None or timer()-self.lastChange>=self.changeTimer :
+                self.lastChange=timer()
+                self.i = 0 if self.i+1==len(self.imageList) else self.i+1
     
     def getAngled(self,degree:float) -> pygame.Surface :
         image = self.get()

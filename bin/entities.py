@@ -29,16 +29,20 @@ class Entity(pygame.sprite.Sprite) :
         self.rect.print()
 
 class Player(Entity) :
-    def __init__(self) :
+    def __init__(self,hitboxOffset:tuple=(0,0),powerCircleOffset:tuple=(0,0)) :
         Entity.__init__(self)
         self.hitbox = None #Sprite
         self.hitboxRect = None #Rectangle
         self.moveSpeed = None #int
+        self.powerCircle = None #Sprite
+        self.powerCircleAngle = 0 #int
         self.slow = False
+        self.hitboxOffset=hitboxOffset
+        self.powerCircleOffset=powerCircleOffset
     
     def updateHitbox(self) :
-        self.hitboxRect.setX(self.rect.getX()+self.rect.getW()//2-self.hitboxRect.getW()//2)
-        self.hitboxRect.setY(self.rect.getY()+self.rect.getH()//2-self.hitboxRect.getH()//2)
+        self.hitboxRect.setX(self.rect.getX()+self.rect.getW()//2-self.hitboxRect.getW()//2+self.hitboxOffset[0])
+        self.hitboxRect.setY(self.rect.getY()+self.rect.getH()//2-self.hitboxRect.getH()//2+self.hitboxOffset[1])
 
     # moves left by the move speed
     def moveLeft(self,boundary:Rectangle) :
@@ -79,6 +83,10 @@ class Player(Entity) :
     def drawHitbox(self,surface:pygame.surface.Surface) :
         surface.blit(self.hitbox.get(),self.hitboxRect)
     
+    def drawPowerCircle(self,surface:pygame.surface.Surface) :
+        surface.blit(self.powerCircle.getAngled(self.powerCircleAngle),(self.rect.getX()+self.powerCircleOffset[0],self.rect.getY()+self.powerCircleOffset[1]))
+        self.powerCircleAngle = (self.powerCircleAngle+1)%360
+
     def pixelPerfectHitboxCollision(self,other:Entity) -> bool :
         ox=int(self.hitboxRect.x-other.rect.x)
         oy=int(self.hitboxRect.y-other.rect.y)
@@ -211,7 +219,7 @@ class RightSeekingBullet(SeekingBullet) :
         Bullet.move(self)
 
 class Enemy(Entity) :
-    def __init__(self) :
+    def __init__(self,bulletSpawnOffset:tuple=(0,0)) :
         Entity.__init__(self)
         self.targetPos = np.array([]) #np array
         self.pattern=[] #pattern[x][0] = delay for fresh start(int); pattern[x][1] = delay between factories spawn; pattern[x][2] = [bulletFactory]
@@ -222,6 +230,7 @@ class Enemy(Entity) :
         self.maxVelocity=None #int
         self.maxForce=None #int
         self.lastSurge=None #timer object
+        self.bulletSpawnOffset=bulletSpawnOffset
 
     def think(self, bullets:pygame.sprite.Group,gameW:int,gameH:int) :
         if (self.lastSurge!=None and timer()-self.lastSurge<self.waitFor) :
@@ -238,11 +247,11 @@ class Enemy(Entity) :
                 self.waitFor=self.pattern[self.lifes-1][0]
                 self.lastSurge=timer()
                 posa=random.randint(1,gameW-self.rect.getW())
-                posb=random.randint(1,gameH//2)
+                posb=random.randint(1,gameH//2-self.rect.getH())
                 self.targetPos=np.array([posa,posb])
                 #TODO: reset circle
 
-            self.pattern[self.lifes-1][2][self.step].spawn(bullets,self.rect.getX(),self.rect.getY())
+            self.pattern[self.lifes-1][2][self.step].spawn(bullets,self.rect.center[0]+self.bulletSpawnOffset[0],self.rect.center[1]+self.bulletSpawnOffset[1])
             self.waitFor=self.pattern[self.lifes-1][1]
             self.step+=1
             self.lastSurge=timer()
